@@ -18,7 +18,7 @@ struct ContentView: View {
             VStack {
                 Image("skave-neutral").resizable().frame(width: 150, height: 150)
                 CustomText(text: "Skave'd")
-                    Image("pips \(randomValue)")
+                Image("pips \(randomValue)")
                     .resizable()
                     .frame(width: 150, height: 150)
                     .rotationEffect(.degrees(rotation))
@@ -27,20 +27,51 @@ struct ContentView: View {
                 CustomText(text: "Turn Score: \(turnScore)")
                 HStack {
                     Button("Roll") {
-                        
+                        chooseRandom(times: 3)
+                        withAnimation(.interpolatingSpring(stiffness: 10, damping: 2)) {
+                            rotation += 360
+                        }
                     }
                     .buttonStyle(CustomButtonStyle())
                     Button("Hold") {
-                        
+                        gameScore += turnScore
+                        endTurn()
+                        withAnimation(.easeInOut(duration: 1)) {
+                            rotation += 360
+                        }
                     }
                     .buttonStyle(CustomButtonStyle())
-                    
                 }
                 CustomText(text: "Game Score: \(gameScore)")
                 Spacer()
             }
+            .padding()
         }
-        .padding()
+    }
+    
+    func endTurn() {
+        turnScore = 0
+        randomValue = 0
+    }
+    
+    func chooseRandom(times: Int) {
+        if times > 0 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                randomValue = Int.random(in: 1...6)
+                chooseRandom(times: times - 1)
+                
+            }
+        }
+        if times == 0 {
+            if randomValue == 1 {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    endTurn()
+                }
+            }
+            else {
+                turnScore += randomValue
+            }
+        }
     }
 }
 
@@ -66,5 +97,17 @@ struct CustomButtonStyle: ButtonStyle {
             .background(.red).opacity(configuration.isPressed ? 0.0 : 1.0)
             .foregroundColor(.white)
             .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+}
+
+struct InstructionsView: View {
+    var body: some View {
+        ZStack {
+            Color.gray.opacity(0.7).ignoresSafeArea()
+            VStack {
+                Image("skave-neutral").resizable().frame(width: 150, height: 150)
+                
+            }
+        }
     }
 }
