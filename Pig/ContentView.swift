@@ -47,17 +47,28 @@ struct ContentView: View {
                         }
                         .buttonStyle(CustomButtonStyle())
                     }
-                    
-                    
                     CustomText(text: "Game Score: \(gameScore)")
-                    
                     NavigationLink("How To Play", destination: InstructionsView())
                         .font(Font.custom("Marker Felt", size: 24))
                         .padding()
+                    Button("Reset") {
+                        endTurn()
+                        gameScore = 0
+                    }
+                    .font(Font.custom("Marker Felt", size: 24))
                     Spacer()
                 }
                 .padding()
             }
+            .alert(isPresented: $gameOver, content: {
+                Alert(title: Text("You won the game!"), dismissButton:
+                        .destructive(Text("Play Again?"), action: {
+                            withAnimation(Animation.default) {
+                                gameScore = 0
+                                gameOver = false
+                            }
+                        }))
+            })
         }
     }
     
@@ -79,7 +90,7 @@ struct ContentView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     endTurn()
                 }
-            
+                
             }
             else {
                 turnScore += randomValue
